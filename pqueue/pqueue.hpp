@@ -1,25 +1,24 @@
 #include <vector>
 #include <string>
-#include <list>
+#include <memory>
 
 struct pqueue {
     // Можете изменить следующую строку
-    using handle = std::list<size_t>::iterator;
+    using handle = size_t*;
 
-    handle insert(int priority, std::string const& name);
-    void erase(handle it);
-    void update_priority(handle it, int new_priority);
-    std::string extract_min();
-    std::string const& get(handle it) const;
-    int get_priority(handle it) const;
-    size_t size() const;
+    auto insert(int priority, std::string const& name) -> handle;
+    auto erase(handle it) -> void;
+    auto update_priority(handle const& it, int new_priority) -> void;
+    auto extract_min() -> std::string;
+    auto get(handle const& it) const -> std::string const&;
+    auto get_priority(handle const& it) const -> int;
+    auto size() const -> size_t;
 
     // Можете изменить последующие строки
     struct heap_element {
         int priority;
-        handle iter;
+        std::unique_ptr<size_t> iter;
         std::string payload;
     };
     std::vector<heap_element> heap; // Куча, в которой хранятся строки и итераторы
-    std::list<size_t> heap_positions; // Список положений строк в куче. Необходимо для быстрого удаления элементов
 };

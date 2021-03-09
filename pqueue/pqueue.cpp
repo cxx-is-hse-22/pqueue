@@ -2,9 +2,10 @@
 #include <string>
 
 pqueue::handle pqueue::insert(int priority, std::string const& name) {
-    auto iter = heap_positions.insert(heap_positions.begin(), heap.size());
-    heap.emplace_back(heap_element{priority, iter, name});
-    return iter;
+    auto iter = std::make_unique<size_t>(heap.size());
+    heap.emplace_back(heap_element{priority, std::move(iter), name});
+    auto handle = heap.back().iter.get();
+    return handle;
 }
 
 void pqueue::erase(handle it) {
@@ -14,27 +15,25 @@ void pqueue::erase(handle it) {
         *(heap[pos].iter) = pos;
     }
     heap.pop_back();
-    heap_positions.erase(it);
 }
 
-void pqueue::update_priority(handle it, int new_priority) {
+void pqueue::update_priority(handle const& it, int new_priority) {
     heap[*it].priority = new_priority;
 }
 
 std::string pqueue::extract_min() {
     std::string s = heap.front().payload;
-    heap_positions.erase(heap.front().iter);
     std::swap(heap.front(), heap.back());
     heap.pop_back();
     *(heap.front().iter) = 0;
     return s;
 }
 
-std::string const& pqueue::get(handle it) const {
+std::string const& pqueue::get(handle const& it) const {
     return heap[*it].payload;
 }
 
-int pqueue::get_priority(handle it) const {
+int pqueue::get_priority(handle const& it) const {
     return heap[*it].priority;
 }
 
